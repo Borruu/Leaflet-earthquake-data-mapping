@@ -1,6 +1,9 @@
 let url =
   "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
+let newUrl =
+  "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson";
+
 d3.json(url).then(function (data) {
   console.log(data.features);
   // mapFeatures(data.features);
@@ -11,8 +14,29 @@ d3.json(url).then(function (data) {
 // get magnitude from properties.mag
 
 // Create function to determine marker colour by earthquake depth
-function setColour(input) {}
+function setColour(input) {
+  if (input < 100) {
+    return "#ffffb2";
+  } else if (input < 200) {
+    return "#eec60a";
+  } else if (input < 300) {
+    return "#fda403";
+  } else if (input < 400) {
+    return "#e8751a";
+  } else if (input < 500) {
+    return "#AD5389";
+  } else {
+    return "#3C1053";
+  }
+}
 
+function setBorder(input) {
+  if (input < 300) {
+    return "black";
+  } else {
+    return "white";
+  }
+}
 // Create function to determine marker size by earthquake magnitude
 function setRadius(input) {
   return input * 50000;
@@ -20,27 +44,28 @@ function setRadius(input) {
 
 // Create empty array to store earthquake markers
 let eqMarkers = [];
-
+let depths = [];
 // Loop through data, create earthquake markers and add them to eqMarkers array
 
 // ______________________________________________________________________________________
 d3.json(url).then(function (data) {
-  // Once we get a response, send the data.features object to the createFeatures function.
   createFeatures(data.features);
 });
 
 function createFeatures(earthquakeData) {
-  // Define a function that we want to run once for each feature in the features array.
-  // Give each feature a popup that describes the place and time of the earthquake.
+  // Define function for each feature in the features array.
+  // Create popup that describes the place and time of the earthquake.
+  // Create earthquake circle markers and add them to eqMarkers array
   function onEachFeature(feature, layer) {
+    depths.push(feature.geometry.coordinates[2]);
     eqMarkers.push(
       L.circle(
         [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
         {
           stroke: false,
-          fillOpacity: 0.75,
-          color: "purple",
-          fillColor: "purple",
+          fillOpacity: 0.5,
+          color: setBorder(feature.geometry.coordinates[2]),
+          fillColor: setColour(feature.geometry.coordinates[2]),
           // size by earthquake magnitude
           radius: setRadius(feature.properties.mag),
         }
@@ -59,12 +84,16 @@ function createFeatures(earthquakeData) {
     onEachFeature: onEachFeature,
   });
 
-  // Send our earthquakes layer to the createMap function/
+  // Send earthquakes layer to the createMap function
   createMap(earthquakes);
+
+  // check magnitude values
+  console.log(depths);
+  console.log(Math.max.apply(Math, depths));
+  console.log(Math.min.apply(Math, depths));
 }
 
 function createMap(earthquakes) {
-  // ______________________________________________________________________________________
   // Create the base layers.
   let street = L.tileLayer(
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

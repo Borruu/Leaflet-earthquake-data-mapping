@@ -5,6 +5,7 @@ let newUrl =
   "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson";
 
 d3.json(url).then(function (data) {
+  console.log(data.bbox);
   console.log(data.features);
   // mapFeatures(data.features);
 });
@@ -62,19 +63,19 @@ function createFeatures(earthquakeData) {
       L.circle(
         [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
         {
-          stroke: false,
+          stroke: true,
+          weight: 0.5,
           fillOpacity: 0.5,
           color: setBorder(feature.geometry.coordinates[2]),
           fillColor: setColour(feature.geometry.coordinates[2]),
           // size by earthquake magnitude
           radius: setRadius(feature.properties.mag),
         }
+      ).bindPopup(
+        `<h3>${feature.properties.place}</h3><hr><p>${new Date(
+          feature.properties.time
+        )}</p>`
       )
-    );
-    layer.bindPopup(
-      `<h3>${feature.properties.place}</h3><hr><p>${new Date(
-        feature.properties.time
-      )}</p>`
     );
   }
 
@@ -108,24 +109,22 @@ function createMap(earthquakes) {
       'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
   });
 
-  // Create layer group for earthquake markers.
-  // let earthquakeLayer = L.layerGroup(eqMarkers)
-
   // Create a baseMaps object to contain the streetmap and the topographical map.
   let baseMaps = {
     Street: street,
     Topography: topo,
   };
-
-  let overlayMaps = {
-    Earthquakes: earthquakes,
-  };
+  // Create layer group for earthquake markers.
   let eqLayer = L.layerGroup(eqMarkers);
+  let overlayMaps = {
+    Earthquakes: eqLayer,
+  };
+
   // Create initial blank map
   let myMap = L.map("map", {
     center: [0, 0],
     zoom: 2,
-    layers: [street, earthquakes, eqLayer],
+    layers: [street, eqLayer],
   });
 
   // Create a layer control that contains our baseMaps and overlayMaps, and add them to the map.
@@ -134,4 +133,32 @@ function createMap(earthquakes) {
       collapsed: false,
     })
     .addTo(myMap);
+
+  // Set up the legend.
+  let legend = L.control({ position: "bottomright" });
+  legend.onAdd = function () {
+    let div = L.DomUtil.create("div", "info legend");
+    let colours = [
+      "#ffffb2",
+      "#eec60a",
+      "#fda403",
+      "#e8751a",
+      "#AD5389",
+      "#3C1053",
+    ];
+    let labels = [
+      "<100m",
+      "100-200m",
+      "200-300m",
+      "300-400m",
+      "400-500m",
+      "500m+",
+    ];
+    for (let i = 0; i < labels.length; i++) {
+      div.innerHTML +=
+        "<div style='background-color: " + colours[i] + "'></div> " + labels[i];
+    }
+    return div;
+  };
+  legend.addTo(myMap);
 }

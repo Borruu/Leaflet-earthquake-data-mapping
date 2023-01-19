@@ -1,19 +1,6 @@
 let url =
   "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
-let newUrl =
-  "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson";
-
-d3.json(url).then(function (data) {
-  console.log(data.bbox);
-  console.log(data.features);
-  // mapFeatures(data.features);
-});
-
-// function getGeometry(data) {}
-// get coordinates - lat, long, depth - from data. geometry[coordinates][0],[1],[2]
-// get magnitude from properties.mag
-
 // Create function to determine marker colour by earthquake depth
 function setColour(input) {
   if (input < 100) {
@@ -30,7 +17,7 @@ function setColour(input) {
     return "#3C1053";
   }
 }
-
+// Create function to determine border colour by earthquake depth (for contrast with light and dark markers)
 function setBorder(input) {
   if (input < 300) {
     return "black";
@@ -45,10 +32,7 @@ function setRadius(input) {
 
 // Create empty array to store earthquake markers
 let eqMarkers = [];
-let depths = [];
-// Loop through data, create earthquake markers and add them to eqMarkers array
 
-// ______________________________________________________________________________________
 d3.json(url).then(function (data) {
   createFeatures(data.features);
 });
@@ -58,7 +42,6 @@ function createFeatures(earthquakeData) {
   // Create popup that describes the place and time of the earthquake.
   // Create earthquake circle markers and add them to eqMarkers array
   function onEachFeature(feature, layer) {
-    depths.push(feature.geometry.coordinates[2]);
     eqMarkers.push(
       L.circle(
         [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
@@ -68,7 +51,6 @@ function createFeatures(earthquakeData) {
           fillOpacity: 0.7,
           color: setBorder(feature.geometry.coordinates[2]),
           fillColor: setColour(feature.geometry.coordinates[2]),
-          // size by earthquake magnitude
           radius: setRadius(feature.properties.mag),
         }
       ).bindPopup(
@@ -87,11 +69,6 @@ function createFeatures(earthquakeData) {
 
   // Send earthquakes layer to the createMap function
   createMap(earthquakes);
-
-  // check magnitude values
-  console.log(depths);
-  console.log(Math.max.apply(Math, depths));
-  console.log(Math.min.apply(Math, depths));
 }
 
 function createMap(earthquakes) {
@@ -109,7 +86,7 @@ function createMap(earthquakes) {
       'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
   });
 
-  // Create a baseMaps object to contain the streetmap and the topographical map.
+  // Create baseMaps object to contain the streetmap and the topographical map.
   let baseMaps = {
     Street: street,
     Topography: topo,
@@ -127,7 +104,7 @@ function createMap(earthquakes) {
     layers: [street, eqLayer],
   });
 
-  // Create a layer control that contains our baseMaps and overlayMaps, and add them to the map.
+  // Create layer control containing baseMaps and overlayMaps, add them to the map.
   L.control
     .layers(baseMaps, overlayMaps, {
       collapsed: false,
@@ -154,34 +131,14 @@ function createMap(earthquakes) {
       "#AD5389",
       "#3C1053",
     ];
-    let labels = [];
 
     let legendInfo = "<h4>Depth (Metres)</h4>";
-    // +
-    // '<div class="labels">' +
-    // '<div class="min">' +
-    // limits[0] +
-    // "</div>" +
-    // '<div class="max">' +
-    // limits[limits.length - 1] +
-    // "</div>" +
-    // "</div>";
-
     div.innerHTML = legendInfo;
 
     for (let i = 0; i < limits.length; i++) {
-      // labels.push(
-      //   `<li><span style="background-color: ${colours[i]}"></span><span>${limits[i]}</span></li>`
-      // );
-
-      // div.innerHTML +=
-      //   '<div style="background-color: ' + colours[i] + '"></div> ' + labels[i];
-
       div.innerHTML += `<div><i style="background:${colours[i]}"></i> 
             ${limits[i]}</div>`;
     }
-
-    // "<ul style='list-style-type:none;'>" + labels.join("") + "</ul>";
     return div;
   };
   legend.addTo(myMap);

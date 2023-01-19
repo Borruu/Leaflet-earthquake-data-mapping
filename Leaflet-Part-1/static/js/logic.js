@@ -65,7 +65,7 @@ function createFeatures(earthquakeData) {
         {
           stroke: true,
           weight: 0.5,
-          fillOpacity: 0.5,
+          fillOpacity: 0.7,
           color: setBorder(feature.geometry.coordinates[2]),
           fillColor: setColour(feature.geometry.coordinates[2]),
           // size by earthquake magnitude
@@ -138,6 +138,14 @@ function createMap(earthquakes) {
   let legend = L.control({ position: "bottomright" });
   legend.onAdd = function () {
     let div = L.DomUtil.create("div", "info legend");
+    let limits = [
+      "<100m",
+      "100-200m",
+      "200-300m",
+      "300-400m",
+      "400-500m",
+      "500m+",
+    ];
     let colours = [
       "#ffffb2",
       "#eec60a",
@@ -146,18 +154,34 @@ function createMap(earthquakes) {
       "#AD5389",
       "#3C1053",
     ];
-    let labels = [
-      "<100m",
-      "100-200m",
-      "200-300m",
-      "300-400m",
-      "400-500m",
-      "500m+",
-    ];
-    for (let i = 0; i < labels.length; i++) {
-      div.innerHTML +=
-        "<div style='background-color: " + colours[i] + "'></div> " + labels[i];
+    let labels = [];
+
+    let legendInfo = "<h4>Depth (Metres)</h4>";
+    // +
+    // '<div class="labels">' +
+    // '<div class="min">' +
+    // limits[0] +
+    // "</div>" +
+    // '<div class="max">' +
+    // limits[limits.length - 1] +
+    // "</div>" +
+    // "</div>";
+
+    div.innerHTML = legendInfo;
+
+    for (let i = 0; i < limits.length; i++) {
+      // labels.push(
+      //   `<li><span style="background-color: ${colours[i]}"></span><span>${limits[i]}</span></li>`
+      // );
+
+      // div.innerHTML +=
+      //   '<div style="background-color: ' + colours[i] + '"></div> ' + labels[i];
+
+      div.innerHTML += `<div><i style="background:${colours[i]}"></i> 
+            ${limits[i]}</div>`;
     }
+
+    // "<ul style='list-style-type:none;'>" + labels.join("") + "</ul>";
     return div;
   };
   legend.addTo(myMap);

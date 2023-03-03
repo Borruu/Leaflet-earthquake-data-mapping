@@ -27,7 +27,11 @@ function setBorder(input) {
 }
 // Create function to determine marker size by earthquake magnitude
 function setRadius(input) {
-  return input * 50000;
+  if (input === 0) {
+    return 1;
+  } else {
+    return input * 50000;
+  }
 }
 
 // Create empty array to store earthquake markers
@@ -138,3 +142,8 @@ function createMap(earthquakes) {
   };
   legend.addTo(myMap);
 }
+d3.json("./tec_data.json").then((data) => {
+  // console.log(importedData);
+  L.geoJson(data).addTo(myMap);
+  // create polygons/polylines with plate data
+});

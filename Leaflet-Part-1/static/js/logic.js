@@ -27,7 +27,11 @@ function setBorder(input) {
 }
 // Create function to determine marker size by earthquake magnitude
 function setRadius(input) {
-  return input * 50000;
+  if (input === 0) {
+    return 1;
+  } else {
+    return input * 50000;
+  }
 }
 
 // Create empty array to store earthquake markers
@@ -54,7 +58,9 @@ function createFeatures(earthquakeData) {
           radius: setRadius(feature.properties.mag),
         }
       ).bindPopup(
-        `<h3>${feature.properties.place}</h3><hr><p>${new Date(
+        `<h3>${
+          feature.properties.place
+        }</h3><hr><div>Magnitude: ${feature.properties.mag.toLocaleString()}. Depth: ${feature.geometry.coordinates[2].toLocaleString()} metres.</div><p>${new Date(
           feature.properties.time
         )}</p>`
       )

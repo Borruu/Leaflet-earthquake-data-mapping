@@ -99,8 +99,11 @@ function createMap(earthquakes) {
   };
   // Create layer group for earthquake markers.
   let eqLayer = L.layerGroup(eqMarkers);
+  let tecLayer = L.layerGroup();
+  // let tectLayer = L.layerGroup(tectonicPlates)
   let overlayMaps = {
     Earthquakes: eqLayer,
+    "Tectonic Plates": tecLayer,
   };
 
   // Create initial blank map
@@ -108,6 +111,16 @@ function createMap(earthquakes) {
     center: [0, 0],
     zoom: 2,
     layers: [street, eqLayer],
+  });
+  // Get Tectonic plate data and add to map layer
+  d3.json(
+    "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json"
+  ).then((data) => {
+    L.geoJSON(data, {
+      color: "orange",
+      weight: 2,
+    }).addTo(tecLayer);
+    tecLayer.addTo(myMap);
   });
 
   // Create layer control containing baseMaps and overlayMaps, add them to the map.
@@ -142,8 +155,3 @@ function createMap(earthquakes) {
   };
   legend.addTo(myMap);
 }
-d3.json("./tec_data.json").then((data) => {
-  // console.log(importedData);
-  L.geoJson(data).addTo(myMap);
-  // create polygons/polylines with plate data
-});

@@ -18,6 +18,9 @@ The files contained in folder **Leaflet-Part-1** map all earthquakes that have o
 
 The files contained in folder **Leaflet-Part-2** will map tectonic plates, overlaid with earthquake data to illustrate the relationship between tectonic plates and seismic activity.
 
+![image](https://github.com/Borruu/leaflet-challenge/assets/112932520/64ec3c95-52bf-4eda-bebf-eb0917113e82)
+
+
 ### References
 Dataset created by the United States Geological Survey: http://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
 
